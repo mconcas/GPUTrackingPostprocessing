@@ -1,0 +1,9 @@
+*.root
+*.png
+*_C*
+_C.so
+*.pcm
+data
+*.lst
+*.json
+*.ini
