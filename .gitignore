@@ -7,3 +7,5 @@ data
 *.lst
 *.json
 *.ini
+*.dat
+*.log
