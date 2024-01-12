@@ -20,7 +20,7 @@ void doBenchmarkAnalysis(const std::string logFileName = "its_time_benchmarks_hi
 
     // Create a histogram if it doesn't exist
     if (histograms.find(operation) == histograms.end()) {
-      histograms[operation] = new TH1F(operation.c_str(), operation.c_str(), 100, 0, 5000); // Adjust binning as needed
+      histograms[operation] = new TH1F(operation.c_str(), operation.c_str(), 350, 0, 10000); // Adjust binning as needed
     }
 
     // Fill the histogram
@@ -36,7 +36,7 @@ void doBenchmarkAnalysis(const std::string logFileName = "its_time_benchmarks_hi
   // Calculate average and RMS, and write histograms to file
 
   // Output Markdown table
-  std::cout << "|-----------|---------|-----|\n";
+  std::cout << "\n";
   std::cout << "| Operation | Average (ms) | RMS (ms) |\n";
   std::cout << "|-----------|---------|-----|\n";
 
@@ -45,7 +45,6 @@ void doBenchmarkAnalysis(const std::string logFileName = "its_time_benchmarks_hi
     std::cout << "| " << op << " | " << hist->GetMean() << " | " << hist->GetRMS() << " |\n";
     hist->Write(); // Clean up the histogram object
   }
-  std::cout << "|-----------|---------|-----|\n";
 
   outputFile.Close();
 }
