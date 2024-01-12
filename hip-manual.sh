@@ -11,4 +11,5 @@ export GPU_DEVICE=3
 o2-ctf-reader-workflow ${GLOSET}  --severity error --max-tf=${MAXTF:-1} --ctf-input data.lst --onlyDet ITS  --allow-missing-detectors  --its-digits --configKeyValues ";;" | \
 o2-its-reco-workflow ${GLOSET} --trackerCA --tracking-mode async --disable-mc --digits-from-upstream --use-gpu-workflow --gpu-device=${GPU_DEVICE} ${ITS_RECOPAR} -b --run;
 
+mv its_time_benchmarks.txt its_time_benchmarks_hip.txt
 mv o2trac_its.root o2trac_its_hip.root
