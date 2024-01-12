@@ -17,3 +17,5 @@ o2-its-reco-workflow ${GLOSET} --trackerCA --tracking-mode async --disable-mc --
 
 mv its_time_benchmarks.txt its_time_benchmarks_cuda.txt
 mv o2trac_its.root o2trac_its_cuda.root
+
+root -q doBenchmarkAnalysis.C+\(\"its_time_benchmarks_cuda\"\)
