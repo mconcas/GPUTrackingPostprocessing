@@ -6,7 +6,7 @@ killall o2-its-reco-workflow -s 9;
 killall o2-ctf-reader-workflow -s 9;
 
 ITS_RECOPAR="--configKeyValues "
-MAXTF=1;
+MAXTF=-1;
 GLOSET="--shm-segment-size 32000000000 --timeframes-rate-limit 3";
 
 # Define ConfigKeyValues
