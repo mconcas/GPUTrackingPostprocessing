@@ -23,6 +23,7 @@ using std::string;
 void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
                    const string cudaFileName = "o2trac_its_cuda.root",
                    const string hipFileName = "o2trac_its_hip.root",
+                   const string gpuWfFileName = "o2trac_its_gpuwf.root",
                    const string path = "./")
 {
   bool anyFile = false;
@@ -35,12 +36,15 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   canvasCPUHIP->Divide(1, 2);
   TCanvas* canvasHIPCUDA = new TCanvas("ptratiohipcuda", "pt Ratio hip/cuda", 800, 1200);
   canvasHIPCUDA->Divide(1, 2);
+  TCanvas* canvasCPUGPUWF = new TCanvas("ptratiocpugpuwf", "pt Ratio cpu/gpuwf", 800, 1200);
+  canvasCPUGPUWF->Divide(1, 2);
 
   canvasPt->SetLogy();
   canvasChi2->SetLogy();
   canvasCPUCUDA->SetLogy();
   canvasCPUHIP->SetLogy();
   canvasHIPCUDA->SetLogy();
+  canvasCPUGPUWF->SetLogy();
 
   float ptMin = 0., ptMax = 20.;
   float chi2Min = 0., chi2Max = 300.;
@@ -52,6 +56,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   TFile* cpuFile = TFile::Open((path + cpuFileName).c_str());
   TFile* cudaFile = TFile::Open((path + cudaFileName).c_str());
   TFile* hipFile = TFile::Open((path + hipFileName).c_str());
+  TFile* gpuWfFile = TFile::Open((path + gpuWfFileName).c_str());
 
   if (cudaFile) {
     cudaPt = new TH1F("cudaPt", "CUDA track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, ptMin, ptMax);
@@ -93,6 +98,21 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     canvasChi2->cd();
     cpuTree->Draw("ITSTrack.getChi2()>>cpuChi2", "", "same");
     cpuChi2->Draw("sames");
+
+    anyFile = true;
+  }
+  if (gpuWfFile) {
+    TH1F* gpuWfPt = new TH1F("gpuWfPt", "GPU WF track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, ptMin, ptMax);
+    TH1F* gpuWfChi2 = new TH1F("gpuWfChi2", "GPU WF track #chi^{2};#chi^{2};counts", chi2Bins, chi2Min, chi2Max);
+    TTree* gpuWfTree = (TTree*)gpuWfFile->Get("o2sim");
+    canvasPt->cd();
+    gpuWfTree->Draw("ITSTrack.getPt()>>gpuWfPt", "", "same");
+    gpuWfPt->Draw("sames");
+    canvasChi2->cd();
+    gpuWfTree->Draw("ITSTrack.getChi2()>>gpuWfChi2", "", "same");
+    gpuWfChi2->Draw("sames");
+    gpuWfPt->SetLineColor(kOrange);
+    gpuWfChi2->SetLineColor(kOrange);
 
     anyFile = true;
   }
@@ -181,9 +201,38 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     ratioChi2HN->GetLowerRefGraph()->SetMaximum(2);
   }
 
+  if (cpuFile && gpuWfFile) {
+    TH1F* cpuPtClone = (TH1F*)cpuPt->Clone("cpuPt");
+    cpuPtClone->SetTitle("CPU vs GPU WF #it{p}_{T} Ratio");
+    auto* ratioPtCG = new TRatioPlot(cpuPtClone, (TH1F*)gpuWfFile->Get("gpuWfPt"));
+    ratioPtCG->GetUpperPad()->SetBottomMargin(0);
+    ratioPtCG->GetUpperPad()->SetGridx();
+    ratioPtCG->GetLowerPad()->SetTopMargin(0);
+    ratioPtCG->GetLowerPad()->SetGridx();
+    canvasCPUGPUWF->cd(1);
+    gPad->SetLogy();
+    ratioPtCG->Draw();
+    ratioPtCG->GetLowerRefGraph()->SetMinimum(0);
+    ratioPtCG->GetLowerRefGraph()->SetMaximum(2);
+
+    TH1F* cpuChi2Clone = (TH1F*)cpuChi2->Clone("cpuChi2");
+    cpuChi2Clone->SetTitle("CPU vs GPU WF #chi^{2} Ratio");
+    auto* ratioChi2CG = new TRatioPlot(cpuChi2Clone, (TH1F*)gpuWfFile->Get("gpuWfChi2"));
+    ratioChi2CG->GetUpperPad()->SetBottomMargin(0);
+    ratioChi2CG->GetUpperPad()->SetGridx();
+    ratioChi2CG->GetLowerPad()->SetTopMargin(0);
+    ratioChi2CG->GetLowerPad()->SetGridx();
+    canvasCPUGPUWF->cd(2);
+    gPad->SetLogy();
+    ratioChi2CG->Draw();
+    ratioChi2CG->GetLowerRefGraph()->SetMinimum(0);
+    ratioChi2CG->GetLowerRefGraph()->SetMaximum(2);
+  }
+
   canvasPt->SaveAs("ptComp.png");
   canvasChi2->SaveAs("chi2Comp.png");
   canvasCPUCUDA->SaveAs("ptRatioCN.png");
   canvasCPUHIP->SaveAs("ptRatioCH.png");
   canvasHIPCUDA->SaveAs("ptRatioHN.png");
+  canvasCPUGPUWF->SaveAs("ptRatioCG.png");
 }
