@@ -17,6 +17,7 @@
 #include <TCanvas.h>
 #include <TTree.h>
 #include <TRatioPlot.h>
+#include <TGraph.h>
 #endif
 
 using std::string;

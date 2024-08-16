@@ -1,6 +1,6 @@
 #! /bin/bash -x
 
-source common-config.sh
+source $1
 
 export ROCR_VISIBLE_DEVICES="0"
 export GPUMEMSIZE=10000000000
