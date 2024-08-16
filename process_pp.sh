@@ -1,5 +1,7 @@
 #! /bin/bash -x
 
+rm -rf *.png
+
 # main processing
 ./cpu-manual.sh common-config_pp.sh
 ./cuda-manual.sh common-config_pp.sh

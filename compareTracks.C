@@ -18,6 +18,9 @@
 #include <TTree.h>
 #include <TRatioPlot.h>
 #include <TGraph.h>
+#include <TSystem.h>
+#include <TLegend.h>
+#include <TStyle.h>
 #endif
 
 using std::string;
@@ -27,6 +30,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
                    const string gpuWfFileName = "o2trac_its_gpuwf.root",
                    const string path = "./")
 {
+  gStyle->SetOptStat(0);
   bool anyFile = false;
   TCanvas* canvasPt = new TCanvas("trackpt", "tracks pt", 800, 600);
   TCanvas* canvasChi2 = new TCanvas("trackchi2", "tracks chi2", 800, 600);
@@ -39,6 +43,8 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   canvasHIPCUDA->Divide(1, 2);
   TCanvas* canvasCPUGPUWF = new TCanvas("ptratiocpugpuwf", "pt Ratio cpu/gpuwf", 800, 1200);
   canvasCPUGPUWF->Divide(1, 2);
+  TCanvas* canvasCUDAGPUWF = new TCanvas("ptratiocudagpuwf", "pt Ratio cuda/gpuwf", 800, 1200);
+  canvasCUDAGPUWF->Divide(1, 2);
 
   canvasPt->SetLogy();
   canvasChi2->SetLogy();
@@ -46,6 +52,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   canvasCPUHIP->SetLogy();
   canvasHIPCUDA->SetLogy();
   canvasCPUGPUWF->SetLogy();
+  canvasCUDAGPUWF->SetLogy();
 
   float ptMin = 0., ptMax = 20.;
   float chi2Min = 0., chi2Max = 300.;
@@ -129,8 +136,10 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     canvasCPUCUDA->cd(1);
     gPad->SetLogy();
     ratioPtCN->Draw();
+
     ratioPtCN->GetLowerRefGraph()->SetMinimum(0);
     ratioPtCN->GetLowerRefGraph()->SetMaximum(2);
+    ratioPtCN->GetLowerRefGraph()->Fit("pol0");
 
     TH1F* cpuChi2Clone = (TH1F*)cpuChi2->Clone("cpuChi2");
     cpuChi2Clone->SetTitle("CPU vs CUDA #chi^{2} Ratio");
@@ -142,8 +151,16 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     canvasCPUCUDA->cd(2);
     gPad->SetLogy();
     ratioChi2CN->Draw();
+
     ratioChi2CN->GetLowerRefGraph()->SetMinimum(0);
     ratioChi2CN->GetLowerRefGraph()->SetMaximum(2);
+    ratioChi2CN->GetLowerRefGraph()->Fit("pol0");
+
+    ratioPtCN->GetUpperPad()->cd();
+    TLegend* legCN = new TLegend(0.3, 0.7, 0.7, 0.85);
+    legCN->AddEntry(cpuPt, "CPU", "l");
+    legCN->AddEntry(cudaPt, "CUDA", "l");
+    legCN->Draw();
   }
 
   if (cpuFile && hipFile) {
@@ -157,8 +174,10 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     canvasCPUHIP->cd(1);
     gPad->SetLogy();
     ratioPtCH->Draw();
+
     ratioPtCH->GetLowerRefGraph()->SetMinimum(0);
     ratioPtCH->GetLowerRefGraph()->SetMaximum(2);
+    ratioPtCH->GetLowerRefGraph()->Fit("pol0");
 
     TH1F* cpuChi2Clone = (TH1F*)cpuChi2->Clone("cpuChi2");
     cpuChi2Clone->SetTitle("CPU vs HIP #chi^{2} Ratio");
@@ -170,8 +189,16 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     canvasCPUHIP->cd(2);
     gPad->SetLogy();
     ratioChi2CH->Draw();
+
     ratioChi2CH->GetLowerRefGraph()->SetMinimum(0);
     ratioChi2CH->GetLowerRefGraph()->SetMaximum(2);
+    ratioChi2CH->GetLowerRefGraph()->Fit("pol0");
+
+    ratioPtCH->GetUpperPad()->cd();
+    TLegend* legCH = new TLegend(0.3, 0.7, 0.7, 0.85);
+    legCH->AddEntry(cpuPt, "CPU", "l");
+    legCH->AddEntry(hipPt, "HIP", "l");
+    legCH->Draw();
   }
 
   if (cudaFile && hipFile) {
@@ -187,6 +214,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     ratioPtHN->Draw();
     ratioPtHN->GetLowerRefGraph()->SetMinimum(0);
     ratioPtHN->GetLowerRefGraph()->SetMaximum(2);
+    ratioPtHN->GetLowerRefGraph()->Fit("pol0");
 
     TH1F* hipChi2Clone = (TH1F*)hipChi2->Clone("hipChi2");
     hipChi2Clone->SetTitle("HIP vs CUDA #chi^{2} Ratio");
@@ -200,6 +228,13 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     ratioChi2HN->Draw();
     ratioChi2HN->GetLowerRefGraph()->SetMinimum(0);
     ratioChi2HN->GetLowerRefGraph()->SetMaximum(2);
+    ratioChi2HN->GetLowerRefGraph()->Fit("pol0");
+
+    ratioPtHN->GetUpperPad()->cd();
+    TLegend* legHN = new TLegend(0.3, 0.7, 0.7, 0.85);
+    legHN->AddEntry(hipPt, "HIP", "l");
+    legHN->AddEntry(cudaPt, "CUDA", "l");
+    legHN->Draw();
   }
 
   if (cpuFile && gpuWfFile) {
@@ -215,6 +250,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     ratioPtCG->Draw();
     ratioPtCG->GetLowerRefGraph()->SetMinimum(0);
     ratioPtCG->GetLowerRefGraph()->SetMaximum(2);
+    ratioPtCG->GetLowerRefGraph()->Fit("pol0");
 
     TH1F* cpuChi2Clone = (TH1F*)cpuChi2->Clone("cpuChi2");
     cpuChi2Clone->SetTitle("CPU vs GPU WF #chi^{2} Ratio");
@@ -228,6 +264,49 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     ratioChi2CG->Draw();
     ratioChi2CG->GetLowerRefGraph()->SetMinimum(0);
     ratioChi2CG->GetLowerRefGraph()->SetMaximum(2);
+    ratioChi2CG->GetLowerRefGraph()->Fit("pol0");
+
+    ratioPtCG->GetUpperPad()->cd();
+    TLegend* legCG = new TLegend(0.3, 0.7, 0.7, 0.85);
+    legCG->AddEntry(cpuPt, "CPU", "l");
+    legCG->AddEntry(gpuWfFile->Get("gpuWfPt"), "GPU WF", "l");
+    legCG->Draw();
+  }
+
+  if (cudaFile && gpuWfFile) {
+    TH1F* cudaPtClone = (TH1F*)cudaPt->Clone("cudaPt");
+    cudaPtClone->SetTitle("CUDA vs GPU WF #it{p}_{T} Ratio");
+    auto* ratioPtCG = new TRatioPlot(cudaPtClone, (TH1F*)gpuWfFile->Get("gpuWfPt"));
+    ratioPtCG->GetUpperPad()->SetBottomMargin(0);
+    ratioPtCG->GetUpperPad()->SetGridx();
+    ratioPtCG->GetLowerPad()->SetTopMargin(0);
+    ratioPtCG->GetLowerPad()->SetGridx();
+    canvasCUDAGPUWF->cd(1);
+    gPad->SetLogy();
+    ratioPtCG->Draw();
+    ratioPtCG->GetLowerRefGraph()->SetMinimum(0);
+    ratioPtCG->GetLowerRefGraph()->SetMaximum(2);
+    ratioPtCG->GetLowerRefGraph()->Fit("pol0");
+
+    TH1F* cudaChi2Clone = (TH1F*)cudaChi2->Clone("cudaChi2");
+    cudaChi2Clone->SetTitle("CUDA vs GPU WF #chi^{2} Ratio");
+    auto* ratioChi2CG = new TRatioPlot(cudaChi2Clone, (TH1F*)gpuWfFile->Get("gpuWfChi2"));
+    ratioChi2CG->GetUpperPad()->SetBottomMargin(0);
+    ratioChi2CG->GetUpperPad()->SetGridx();
+    ratioChi2CG->GetLowerPad()->SetTopMargin(0);
+    ratioChi2CG->GetLowerPad()->SetGridx();
+    canvasCUDAGPUWF->cd(2);
+    gPad->SetLogy();
+    ratioChi2CG->Draw();
+    ratioChi2CG->GetLowerRefGraph()->SetMinimum(0);
+    ratioChi2CG->GetLowerRefGraph()->SetMaximum(2);
+    ratioChi2CG->GetLowerRefGraph()->Fit("pol0");
+
+    ratioPtCG->GetUpperPad()->cd();
+    TLegend* legCG = new TLegend(0.3, 0.7, 0.7, 0.85);
+    legCG->AddEntry(cudaPt, "CUDA", "l");
+    legCG->AddEntry(gpuWfFile->Get("gpuWfPt"), "GPU WF", "l");
+    legCG->Draw();
   }
 
   canvasPt->SaveAs("ptComp.png");
@@ -236,4 +315,5 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   canvasCPUHIP->SaveAs("ptRatioCH.png");
   canvasHIPCUDA->SaveAs("ptRatioHN.png");
   canvasCPUGPUWF->SaveAs("ptRatioCG.png");
+  canvasCUDAGPUWF->SaveAs("ptRatioNG.png");
 }
