@@ -5,8 +5,8 @@ rm -f /dev/shm/*fmq*;
 killall o2-its-reco-workflow -s 9;
 killall o2-ctf-reader-workflow -s 9;
 
-MODE=sync
-MODE_NUM=$((MODE == "sync" ? 0 : 1))
+MODE=async
+[ $MODE == "sync" ] && MODE_NUM=0 || MODE_NUM=1
 ITS_RECOPAR="--configKeyValues "
 MAXTF=1;
 GLOSET="--shm-segment-size 16000000000";
@@ -16,7 +16,7 @@ ITS_CLUSTERPAR=";ITSClustererParam.maxBCDiffToMaskBias=-10;ITSClustererParam.max
 FASTMULTPAR=";fastMultConfig.cutMultClusLow=-1;fastMultConfig.cutMultClusHigh=-1;fastMultConfig.cutMultVtxHigh=-1;"
 
 # Cuts for PbPb specificially
-ITS_TRKPAR="ITSCATrackerParam.nThreads=20;ITSVertexerParam.nThreads=20;ITSVertexerParam.phiCut=0.005;ITSVertexerParam.clusterContributorsCut=16;ITSVertexerParam.tanLambdaCut=0.002;ITSVertexerParam.lowMultBeamDistCut=0;ITSCATrackerParam.saveTimeBenchmarks=true;ITSCATrackerParam.trackingMode=${MODE_NUM}"
+ITS_TRKPAR="ITSGpuTrackingParam.nBlocks=20;ITSGpuTrackingParam.nThreads=256;ITSCATrackerParam.useFastMaterial=false;ITSCATrackerParam.nThreads=20;ITSVertexerParam.nThreads=20;ITSVertexerParam.phiCut=0.005;ITSVertexerParam.clusterContributorsCut=16;ITSVertexerParam.tanLambdaCut=0.002;ITSVertexerParam.lowMultBeamDistCut=0;ITSCATrackerParam.saveTimeBenchmarks=true;ITSCATrackerParam.trackingMode=${MODE_NUM}"
 
 # Sync or async
 # --ccdb-meanvertex-seed
