@@ -4,7 +4,6 @@ import re
 import csv
 import argparse
 
-# Define regular expressions for the values you want to extract
 regex_patterns = {
     'its_clusters': r'ITSTracker pulled (\d+) clusters, \d+ RO frames',
     'bc_per_rof': r'ITSAlpideParam.roFrameLengthInBC : (\d+)',
@@ -13,29 +12,33 @@ regex_patterns = {
     'its_vertices': r'ITSTracker pushed \d+ tracks and (\d+) vertices',
     'gpu_time_cpu': r'GPU Reconstruction time for this TF ([\d.]+) s \(cpu\)',
     'gpu_time_wall': r'GPU Reconstruction time for this TF [\d.]+ s \(cpu\), ([\d.]+) s \(wall\)',
+    'cpu_time_cpu': r'CPU Reconstruction time for this TF ([\d.]+) s \(cpu\)',
+    'cpu_time_wall': r'CPU Reconstruction time for this TF [\d.]+ s \(cpu\), ([\d.]+) s \(wall\)',
 }
 
 def process_log(logfile, output):
     """Process the log file and extract all occurrences of the desired values."""
     all_data = []
     with open(logfile, 'r') as file:
-        log_content = file.read()
-        for match_set in re.finditer(r'\*', log_content):
-            extracted_data = []
-            log_slice = log_content[match_set.start():]
+        log_lines = file.readlines()
+        extracted_data = []
+        for line in log_lines:
+            line_data = []
             for key, pattern in regex_patterns.items():
-                matches = re.search(pattern, log_slice)
-                if matches:
-                    extracted_data.append(matches.group(1))
+                match = re.search(pattern, line)
+                if match:
+                    line_data.append(match.group(1))
                 else:
-                    extracted_data.append("NA")
-            all_data.append(extracted_data)
+                    line_data.append("NA")
+            if any(value != "NA" for value in line_data):
+                all_data.append(line_data)
+
     with open(output, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=' ')
         csvwriter.writerow(regex_patterns.keys())
         csvwriter.writerows(all_data)
 
-    print(f"Done. Check '{output}'")
+    print(f"Done. Check '{output}' for the results.")
 
 def main():
     parser = argparse.ArgumentParser(description="Process a log file and extract relevant data.")
@@ -45,3 +48,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
