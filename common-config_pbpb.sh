@@ -8,7 +8,7 @@ killall o2-ctf-reader-workflow -s 9;
 MODE=async
 [ $MODE == "sync" ] && MODE_NUM=0 || MODE_NUM=1
 ITS_RECOPAR="--configKeyValues "
-MAXTF=1;
+MAXTF=-1;
 GLOSET="--shm-segment-size 16000000000";
 
 # Define ConfigKeyValues
