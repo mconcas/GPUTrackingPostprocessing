@@ -1,4 +1,4 @@
-#! /usr/bin/bash -xe
+#! /usr/bin/bash -x
 
 # post processing for tracking output
 root -l -q compareTracks.C+

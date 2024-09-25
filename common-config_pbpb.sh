@@ -9,7 +9,7 @@ MODE=async
 [ $MODE == "sync" ] && MODE_NUM=0 || MODE_NUM=1
 ITS_RECOPAR="--configKeyValues "
 MAXTF=-1;
-GLOSET="--shm-segment-size 16000000000";
+GLOSET="--shm-segment-size 32000000000";
 
 # Define ConfigKeyValues
 ITS_CLUSTERPAR=";ITSClustererParam.maxBCDiffToMaskBias=-10;ITSClustererParam.maxBCDiffToSquashBias=10;"
