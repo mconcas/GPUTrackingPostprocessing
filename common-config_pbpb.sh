@@ -23,7 +23,7 @@ ITS_TRKPAR="ITSGpuTrackingParam.nBlocks=60;ITSGpuTrackingParam.nThreads=1024;ITS
 ITS_TRACKING_MODE="--tracking-mode ${MODE}"
 
 # GPU workflow specific config to run TPC GPU
-GPU_WORKFLOW_PARS=";GPU_global.deviceType=HIP;GPU_proc.forceMemoryPoolSize=10000000000;GPU_proc.forceHostMemoryPoolSize=1073741824;"
+GPU_WORKFLOW_PARS=";GPU_global.deviceType=HIP;GPU_proc.forceMemoryPoolSize=11000000000;GPU_proc.forceHostMemoryPoolSize=1073741824;"
 
 # Assemble parameters
 ITS_RECOPAR+=";$ITS_CLUSTERPAR;$FASTMULTPAR;$ITS_TRKPAR;"
