@@ -54,9 +54,9 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   canvasCPUGPUWF->SetLogy();
   canvasCUDAGPUWF->SetLogy();
 
-  float ptMin = 0., ptMax = 20.;
-  float chi2Min = 0., chi2Max = 300.;
-  int ptBins = 150, chi2Bins = 150;
+  float ptMin = 0.01, ptMax = 15.;
+  float chi2Min = 0., chi2Max = 150.;
+  int ptBins = 75, chi2Bins = 100;
 
   TH1F *cpuPt = nullptr, *cudaPt = nullptr, *hipPt = nullptr;
   TH1F *cpuChi2 = nullptr, *cudaChi2 = nullptr, *hipChi2 = nullptr;
@@ -66,8 +66,14 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
   TFile* hipFile = TFile::Open((path + hipFileName).c_str());
   TFile* gpuWfFile = TFile::Open((path + gpuWfFileName).c_str());
 
+  double xbins[ptBins + 1];
+  double a = std::log(ptMax / ptMin) / ptBins;
+  for (int i = 0; i <= ptBins; i++) {
+    xbins[i] = ptMin * std::exp(i * a);
+  }
+
   if (cudaFile) {
-    cudaPt = new TH1F("cudaPt", "CUDA track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, ptMin, ptMax);
+    cudaPt = new TH1F("cudaPt", "CUDA track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, xbins);
     cudaChi2 = new TH1F("cudaChi2", "CUDA track #chi^{2};#chi^{2};counts", chi2Bins, chi2Min, chi2Max);
     TTree* cudaTree = (TTree*)cudaFile->Get("o2sim");
     canvasPt->cd();
@@ -82,7 +88,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     anyFile = true;
   }
   if (hipFile) {
-    hipPt = new TH1F("hipPt", "HIP track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, ptMin, ptMax);
+    hipPt = new TH1F("hipPt", "HIP track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, xbins);
     hipChi2 = new TH1F("hipChi2", "HIP track #chi^{2};#chi^{2};counts", chi2Bins, chi2Min, chi2Max);
     TTree* hipTree = (TTree*)hipFile->Get("o2sim");
     canvasPt->cd();
@@ -97,7 +103,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     anyFile = true;
   }
   if (cpuFile) {
-    cpuPt = new TH1F("cpuPt", "CPU track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, ptMin, ptMax);
+    cpuPt = new TH1F("cpuPt", "CPU track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, xbins);
     cpuChi2 = new TH1F("cpuChi2", "CPU track #chi^{2};#chi^{2};counts", chi2Bins, chi2Min, chi2Max);
     TTree* cpuTree = (TTree*)cpuFile->Get("o2sim");
     canvasPt->cd();
@@ -110,7 +116,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     anyFile = true;
   }
   if (gpuWfFile) {
-    TH1F* gpuWfPt = new TH1F("gpuWfPt", "GPU WF track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, ptMin, ptMax);
+    TH1F* gpuWfPt = new TH1F("gpuWfPt", "GPU WF track #it{p}_{T};#it{p}_{T} (GeV);counts", ptBins, xbins);
     TH1F* gpuWfChi2 = new TH1F("gpuWfChi2", "GPU WF track #chi^{2};#chi^{2};counts", chi2Bins, chi2Min, chi2Max);
     TTree* gpuWfTree = (TTree*)gpuWfFile->Get("o2sim");
     canvasPt->cd();
@@ -307,6 +313,7 @@ void compareTracks(const string cpuFileName = "o2trac_its_cpu.root",
     legCG->AddEntry(cudaPt, "CUDA", "l");
     legCG->AddEntry(gpuWfFile->Get("gpuWfPt"), "GPU WF", "l");
     legCG->Draw();
+    sleep(1000);
   }
 
   canvasPt->SaveAs("ptComp.png");

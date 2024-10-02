@@ -16,7 +16,7 @@ ITS_CLUSTERPAR=";ITSClustererParam.maxBCDiffToMaskBias=-10;ITSClustererParam.max
 FASTMULTPAR=";fastMultConfig.cutMultClusLow=-1;fastMultConfig.cutMultClusHigh=-1;fastMultConfig.cutMultVtxHigh=-1;"
 
 # Cuts for PbPb specificially
-ITS_TRKPAR="ITSGpuTrackingParam.nBlocks=60;ITSGpuTrackingParam.nThreads=1024;ITSCATrackerParam.useFastMaterial=false;ITSCATrackerParam.nThreads=20;ITSVertexerParam.nThreads=20;ITSVertexerParam.phiCut=0.005;ITSVertexerParam.clusterContributorsCut=16;ITSVertexerParam.tanLambdaCut=0.002;ITSVertexerParam.lowMultBeamDistCut=0;ITSCATrackerParam.saveTimeBenchmarks=true;ITSCATrackerParam.trackingMode=${MODE_NUM}"
+ITS_TRKPAR="ITSGpuTrackingParam.nBlocks=30;ITSGpuTrackingParam.nThreads=1;ITSCATrackerParam.useFastMaterial=false;ITSCATrackerParam.nThreads=20;ITSVertexerParam.nThreads=20;ITSVertexerParam.phiCut=0.005;ITSVertexerParam.clusterContributorsCut=16;ITSVertexerParam.tanLambdaCut=0.002;ITSVertexerParam.lowMultBeamDistCut=0;ITSCATrackerParam.saveTimeBenchmarks=true;ITSCATrackerParam.trackingMode=${MODE_NUM}"
 
 # Sync or async
 # --ccdb-meanvertex-seed
