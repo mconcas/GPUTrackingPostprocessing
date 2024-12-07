@@ -5,11 +5,13 @@ rm -f /dev/shm/*fmq*;
 killall o2-its-reco-workflow -s 9;
 killall o2-ctf-reader-workflow -s 9;
 
+export ALICEO2_CCDB_LOCALCACHE=ccdb
+
 MODE=async
 MODE_NUM=
 [ $MODE == "sync" ] && MODE_NUM=0 || MODE_NUM=1
 ITS_RECOPAR="--configKeyValues "
-MAXTF=2;
+MAXTF=1;
 GLOSET="--shm-segment-size 16000000000";
 
 # Define ConfigKeyValues
@@ -17,7 +19,7 @@ ITS_CLUSTERPAR=";ITSClustererParam.maxBCDiffToMaskBias=-10;ITSClustererParam.max
 FASTMULTPAR=";fastMultConfig.cutMultClusLow=-1;fastMultConfig.cutMultClusHigh=-1;fastMultConfig.cutMultVtxHigh=-1;"
 
 # Cuts for pp specifically
-ITS_TRKPAR="ITSGpuTrackingParam.nBlocks=20;ITSGpuTrackingParam.nThreads=256;ITSCATrackerParam.useFastMaterial=false;ITSCATrackerParam.nThreads=1;ITSVertexerParam.nThreads=1;ITSCATrackerParam.saveTimeBenchmarks=true;ITSVertexerParam.phiCut=0.5;ITSVertexerParam.clusterContributorsCut=3;ITSVertexerParam.tanLambdaCut=0.2;ITSCATrackerParam.saveTimeBenchmarks=true;ITSCATrackerParam.trackingMode=${MODE_NUM}"
+ITS_TRKPAR="ITSGpuTrackingParam.nBlocks=30;ITSGpuTrackingParam.nThreads=1;ITSCATrackerParam.useFastMaterial=false;ITSCATrackerParam.nThreads=1;ITSVertexerParam.nThreads=1;ITSCATrackerParam.saveTimeBenchmarks=true;ITSVertexerParam.phiCut=0.5;ITSVertexerParam.clusterContributorsCut=3;ITSVertexerParam.tanLambdaCut=0.2;ITSCATrackerParam.saveTimeBenchmarks=true;ITSCATrackerParam.trackingMode=${MODE_NUM}"
 
 # Sync or async
 # --ccdb-meanvertex-seed
